@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "home": "Home",
+    "movies": "Movies",
+    "series": "TV Series",
+    "anime": "Anime",
+    "search": "Search"
+  },
+  "categories": {
+    "all": "All",
+    "action": "Action",
+    "comedy": "Comedy",
+    "drama": "Drama",
+    "horror": "Horror",
+    "romance": "Romance",
+    "scifi": "Sci-Fi"
+  },
+  "Content": {
+    "watchTitle": "Watch Now",
+    "releaseDate":"releaseDate",
+    "stautsmovies": ["Returning Series","Returning Series","Ended","Released"],
+    "Season": "Season ",
+    "originalLanguage": "OriginalLanguage",
+    "status":"status",
+    "overview":"overview",
+    "episodes":"episodes",
+    "similarShows":"Similar Shows",
+    "viewDetails":"view Details",
+    "popularMovies":"Popular Movies",
+    "topRated":"Top Rated Movies",
+    "netflix":"Netflix Top 10",
+    "serchMoviesTvs":"Search a movie or a tv chow",
+    "shoseEpisodes":"shoseEpisodes",
+    "shoseServer":"shoseEpisodes",
+    "serverInfo":" If the server does not work for you, switch to another and make sure to enable the subtitle from the video settings. ",
+    "langugeNotSupported":"The movie overview is not available in your language."
+    
+
+    
+
+
+  }
+}

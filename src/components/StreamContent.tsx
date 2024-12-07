@@ -62,6 +62,8 @@ export default function StreamContent({ mediaType }: StreamContentProps) {
         allowFullScreen
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         className="rounded-lg"
+        name="iframe"
+        id='iframe'
       />
     );
   };

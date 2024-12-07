@@ -39,7 +39,7 @@ export default function Anime() {
     <main className="min-h-screen bg-gray-900 pt-20">
       <div className="mx-auto max-w-7xl px-4 py-8">
         <h1 className="mb-8 text-3xl font-bold text-white">Anime Series</h1>
-        <MediaGrid items={anime.results} mediaType="tv" />
+        <MediaGrid items={anime.results} mediaType="anime"  />
         <div className="mt-8">
           <Pagination
             currentPage={currentPage}

@@ -6,6 +6,7 @@ import { MovieDetails as MovieDetailsType } from '../types/movie';
 
 export default function MovieDetails() {
   const { id } = useParams();
+  
   const navigate = useNavigate();
   const [movie, setMovie] = useState<MovieDetailsType | null>(null);
   const [loading, setLoading] = useState(true);

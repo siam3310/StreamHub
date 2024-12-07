@@ -12,7 +12,7 @@ interface Media {
 
 interface MediaGridProps {
   items: Media[];
-  mediaType: 'movie' | 'tv';
+  mediaType: 'movie' | 'tv'| "anime";
 }
 
 export default function MediaGrid({ items, mediaType }: MediaGridProps) {
@@ -21,7 +21,7 @@ export default function MediaGrid({ items, mediaType }: MediaGridProps) {
       {items.map((item) => (
         <div key={item.id} className="group relative overflow-hidden rounded-lg">
           <Link 
-            to={`/${item.media_type || mediaType}/${item.id}`}
+            to={`/${item.media_type || mediaType}/${item.id}/${ mediaType==="anime"?"true":""}`}
             state={{ media: item }}
           >
             <img

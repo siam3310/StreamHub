@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cliqz/adblocker": "^1.34.0",
+    "@cliqz/adblocker-electron": "^1.34.0",
     "@vitalets/google-translate-api": "^9.2.0",
     "dotenv": "^16.4.6",
     "i18next": "^23.16.8",

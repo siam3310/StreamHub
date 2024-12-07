@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useRoutes, Router, useNavigate } from 'react-router-dom';
 import { Clock, Star } from 'lucide-react';
 import { fetchDetails, fetchSeasonDetails } from '../services/api';
 import MediaGrid from '../components/MediaGrid';
@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 
 interface MediaDetailsProps {
-  mediaType: 'movie' | 'tv';
+  mediaType: 'movie' | 'tv'|"anime";
 }
 
 export default function MediaDetails({ mediaType }: MediaDetailsProps) {
@@ -22,7 +22,14 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
   const [isWatching, setIsWatching] = useState(false);
   const [seasonDetails, setSeasonDetails] = useState(null);
   const { t, i18n } = useTranslation();
+  const navigate=useNavigate()
+  if (id==="225385") {
+navigate("/")
 
+
+    
+  }
+console.log(mediaType)
   const getStatusTranslation = (status: string): string => {
     const statusTranslations = t("Content.stautsmovies", { returnObjects: true }) as string[];
   
@@ -144,7 +151,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
           <div className="lg:col-span-2">
             {isWatching ? (
               <div className="space-y-4">
-                {mediaType === 'tv' && (
+                {mediaType !== 'movie' && (
                   <div className="flex-col items-center gap-2">
                     <p className='text-sm py-4 px-2 font-medium text-white text-wrap'>{t("Content.shoseEpisodes")}</p>
 

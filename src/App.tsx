@@ -11,12 +11,22 @@ import MediaDetails from './pages/MediaDetails';
 import StreamContent from './components/StreamContent';
 import './i18n';
 import CategoryMovies from './pages/CategoryMovies';
-import AdBlocker from './components/ads';
+//import AdBlockAndResize from"./components/adsbolker"
+import AdBlocker from './components/adsbolker';
+
+//import AdBlocker from './components/ads';
+
 export default function App() {
+
+  
+
+
+  //AdBlockAndResize
   return (
+
     
     <Router>
-      <AdBlocker></AdBlocker>
+     <AdBlocker  />
       <ScrollToTop />
       <div className="flex min-h-screen flex-col">
         <Navbar />
@@ -30,7 +40,9 @@ export default function App() {
             <Route path="/anime" element={<Anime />} />
             <Route path="/search" element={<Search />} />
             <Route path="/movie/:id" element={<MediaDetails mediaType="movie" />} />
+            <Route path="/anime/:id/:isAnime" element={<MediaDetails mediaType="tv"  />} />
             <Route path="/tv/:id" element={<MediaDetails mediaType="tv" />} />
+            <Route path="/stream/movie/:id" element={<StreamContent mediaType="movie" />} />
             <Route path="/stream/movie/:id" element={<StreamContent mediaType="movie" />} />
             <Route path="/stream/tv/:id/season/:season/episode/:episode" element={<StreamContent mediaType="tv" />} />
           </Routes>

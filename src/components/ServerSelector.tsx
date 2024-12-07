@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ServerSelectorProps {
-  mediaType: 'movie' | 'tv';
+  mediaType: 'movie' | 'tv'|"anime";
   mediaId: string;
   selectedSeason?: number;
   selectedEpisode?: number;

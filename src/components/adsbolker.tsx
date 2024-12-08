@@ -1,104 +1,84 @@
 import { useEffect } from 'react';
 
-// Patterns to block ads and suspicious elements
-const blockPatterns = {
-  ids: ['dontfoid', 'ad-container', 'popup-ad'], // Specific IDs to block
-  styles: [
-    'top: -1000px',
-    'visibility: hidden',
-    'display: none',
-    'position: fixed',
-    'z-index: 2147483647', // Overlay ads
-  ],
-  tags: [
-    'iframe[width="0"][height="0"]',
-    'iframe[style*="visibility: hidden"]',
-    'iframe[style*="top: -1000px"]',
-    'a[href*="journaleco.ma"]', // Example ad-related links
-    'a[style*="position: fixed"][style*="z-index: 2147483647"]', // Overlay ad links
-  ],
-};
-
-// Function to remove unwanted elements dynamically
-const removeSuspiciousElements = (): void => {
-  // Remove elements by ID
-  blockPatterns.ids.forEach((id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      console.log('Removing element by ID:', element);
-      element.remove();
-    }
-  });
-
-  // Remove elements with specific styles
-  const elements = document.querySelectorAll<HTMLElement>('*');
-  elements.forEach((element) => {
-    const style = element.getAttribute('style') || '';
-    if (blockPatterns.styles.some((pattern) => style.includes(pattern))) {
-      console.log('Removing element by style:', element);
-      element.remove();
-    }
-  });
-
-  // Remove specific tags
-  blockPatterns.tags.forEach((tag) => {
-    const taggedElements = document.querySelectorAll(tag);
-    taggedElements.forEach((element) => {
-      console.log('Removing element by tag:', element);
-      element.remove();
-    });
-  });
-};
-
-// Network request interception to block suspicious requests
-const interceptRequests = (): void => {
-  const originalFetch = window.fetch;
-  window.fetch = async (...args: [RequestInfo, RequestInit]) => {
-    const url = args[0];
-    if (
-      typeof url === 'string' &&
-      blockPatterns.tags.some((pattern) => url.includes(pattern))
-    ) {
-      console.log('Blocked request to:', url);
-      return new Response(null, { status: 204 });
-    }
-    return originalFetch(...args);
-  };
-
-  const originalXhrOpen = XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open = function (...args: [string, string, boolean?]) {
-    const url = args[1];
-    if (
-      typeof url === 'string' &&
-      blockPatterns.tags.some((pattern) => url.includes(pattern))
-    ) {
-      console.log('Blocked request to:', url);
-      this.abort();
-    } else {
-      originalXhrOpen.apply(this, args);
-    }
-  };
-};
-
-// AdBlocker Component
-const AdBlocker: React.FC = () => {
+const AdBlocker = () => {
   useEffect(() => {
-    // Intercept network requests
-    interceptRequests();
+    const blockPatterns = {
+      href: ['adsco.re', 'uzvcffe-aw.vip'],
+      src: ['adsco.re', 'c.adsco.re'],
+      styles: ['font-size: 5px', 'display: none', 'visibility: hidden', 'position: absolute', 'top: -1000px', 'left: -1000px',],
+      iframes: ['iframeParent'], // Add iframe names to target specific ones
+    };
 
-    // Run cleanup initially
-    removeSuspiciousElements();
+    // Function to clean elements in a given document
+    const cleanDocument = (doc) => {
+      // Remove <a> tags
+      doc.querySelectorAll('a').forEach((anchor) => {
+        const href = anchor.getAttribute('href') || '';
+        const style = anchor.getAttribute('style') || '';
+        if (
+          blockPatterns.href.some((pattern) => href.includes(pattern)) ||
+          blockPatterns.styles.some((pattern) => style.includes(pattern))
+        ) {
+          anchor.remove();
+        }
+      });
 
-    // Set interval to run every 3 seconds
-    const interval = setInterval(removeSuspiciousElements, 3000);
+      // Remove <script> tags
+      doc.querySelectorAll('script').forEach((script) => {
+        const src = script.getAttribute('src') || '';
+        if (blockPatterns.src.some((pattern) => src.includes(pattern))) {
+          script.remove();
+        }
+      });
 
-    // Cleanup on unmount
+      // Remove <iframe> tags
+      doc.querySelectorAll('iframe').forEach((iframe) => {
+        const name = iframe.getAttribute('name') || '';
+        const style = iframe.getAttribute('style') || '';
+        if (
+          blockPatterns.iframes.includes(name) ||
+          blockPatterns.styles.some((pattern) => style.includes(pattern)) ||
+          iframe.width === '0' ||
+          iframe.height === '0'
+        ) {
+          iframe.remove();
+        } else {
+          // Clean inside iframe
+          try {
+            cleanDocument(iframe.contentDocument || iframe.contentWindow.document);
+          } catch (err) {
+            console.error('Cannot access iframe content:', err);
+          }
+        }
+      });
+    };
+
+    // Create a MutationObserver to observe DOM changes
+    const observer = new MutationObserver(() => {
+      cleanDocument(document);
+    });
+
+    // Configure the observer to watch for added nodes in the document
+    observer.observe(document.body, {
+      childList: true, // Watch for added/removed child elements
+      subtree: true,   // Watch the entire document
+    });
+
+    // Run the blockAds function every 1 second as a fallback
+    const intervalId = setInterval(() => {
+      cleanDocument(document);
+    }, 1000);
+
+    console.log('Ad-blocking script running...');
+
+    // Clean up when component is unmounted
     return () => {
-      clearInterval(interval);
+      clearInterval(intervalId); // Clear the interval
+      observer.disconnect(); // Disconnect the observer
     };
   }, []);
 
-  return null; // No UI component
+  return null; // This component does not render anything in the UI
 };
 
 export default AdBlocker;

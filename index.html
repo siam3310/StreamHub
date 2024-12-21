@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/movie.svg" />
+    <link rel="icon" href="/movie.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <!-- Primary Meta Tags -->
@@ -34,9 +34,39 @@
     <meta name="author" content="StreamHub Team" />
     
     <!-- Keywords -->
-    <meta name="keywords" content="free movies, online streaming, watch tv shows, movie streaming, free entertainment, latest movies, streaming platform" />
+    <meta name="keywords" content="free movies, online streaming, watch tv shows, movie streaming, free entertainment, latest movies, streaming platform, watch movies online, HD streaming, free movies and TV shows" />
+    
+    <!-- Schema Markup (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "StreamHub",
+        "url": "https://Stream-hub-movies.vercel.app",
+        "description": "StreamHub offers an extensive collection of free movies and TV shows. Stream high-quality content instantly, discover new releases, and enjoy seamless online entertainment without subscriptions.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "StreamHub Team",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.streamhub.com/logo.jpg"
+          }
+        }
+      }
+    </script>
+    
+    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7888198940661703"
      crossorigin="anonymous"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-XXXXX-X"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-XXXXX-X');
+    </script>
   </head>
   <body>
     <div id="root"></div>

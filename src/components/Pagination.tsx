@@ -62,7 +62,7 @@ export default function Pagination({
       ))}
       <button
         onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        
         className="rounded-lg bg-gray-800 p-2 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white disabled:opacity-50"
       >
         <ChevronRight className="h-5 w-5" />

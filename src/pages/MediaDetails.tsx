@@ -7,7 +7,7 @@ import ServerSelector from '../components/ServerSelector';
 import { useTranslation } from 'react-i18next';
 
 interface MediaDetailsProps {
-  mediaType: 'movie' | 'tv' | 'anime';
+  mediaType: 'movie' | 'tv' | "anime";
 }
 
 export default function MediaDetails({ mediaType }: MediaDetailsProps) {
@@ -15,28 +15,27 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
   const location = useLocation();
   const [details, setDetails] = useState(location.state?.media || null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [isWatching, setIsWatching] = useState(false);
   const [seasonDetails, setSeasonDetails] = useState(null);
-  const [mediaLinks, setMediaLinks] = useState<any>(null); // To store download/watch links
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
-  if (id === '225385') {
-    navigate('/');
+  if (id === "225385") {
+    navigate("/")
   }
 
   const getStatusTranslation = (status: string): string => {
-    const statusTranslations = t('Content.stautsmovies', { returnObjects: true }) as string[];
+    const statusTranslations = t("Content.stautsmovies", { returnObjects: true }) as string[];
 
     switch (status) {
-      case 'Returning Series':
+      case "Returning Series":
         return statusTranslations[0];
-      case 'Ended':
+      case "Ended":
         return statusTranslations[2];
-      case 'Released':
+      case "Released":
         return statusTranslations[3];
       default:
         return statusTranslations[1]; // Fallback status
@@ -48,18 +47,12 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
       if (!id) return;
       try {
         setLoading(true);
-        setError('');
+        setError("");
         const data = await fetchDetails(mediaType, id, i18n.language);
         setDetails(data);
 
-        // Fetch download and watch links from the provided JSON URL
-        const res = await fetch('https://siamstv.vercel.app/tv/movies.json');
-        const jsonData = await res.json();
-        const mediaData = jsonData.find((item: any) => item.id === id);
-        setMediaLinks(mediaData); // Store the media links
-
         if (mediaType === 'tv') {
-          const seasonData = await fetchSeasonDetails(id, selectedSeason, 'en');
+          const seasonData = await fetchSeasonDetails(id, selectedSeason, "en");
           setSeasonDetails(seasonData);
         }
       } catch (error) {
@@ -138,7 +131,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               onClick={() => setIsWatching(true)}
               className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
             >
-              {t('Content.watchTitle')}
+              {t("Content.watchTitle")}
             </button>
           </div>
         </div>
@@ -151,10 +144,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               <div className="space-y-4">
                 {mediaType !== 'movie' && (
                   <div className="flex-col items-center gap-2">
-                    <p className="text-sm py-4 px-2 font-medium text-white text-wrap">
-                      {t('Content.shoseEpisodes')}
-                    </p>
-
+                    <p className='text-sm py-4 px-2 font-medium text-white text-wrap'>{t("Content.shoseEpisodes")}</p>
                     <div className="flex gap-4">
                       <select
                         value={selectedSeason}
@@ -168,7 +158,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                           { length: details.number_of_seasons || 0 },
                           (_, i) => (
                             <option key={i + 1} value={i + 1}>
-                              {t('Content.Season')} {i + 1}
+                              {t("Content.Season")}  {details.selectSeason} {i + 1}
                             </option>
                           )
                         )}
@@ -190,9 +180,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                     </div>
                   </div>
                 )}
-                <p className="text-sm py-4 px-2 font-medium text-white text-wrap">
-                  {t('Content.shoseServer')}
-                </p>
+                <p className='text-sm py-4 px-2 font-medium text-white text-wrap'>{t("Content.shoseServer")}</p>
 
                 <ServerSelector
                   mediaType={mediaType}
@@ -203,9 +191,9 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               </div>
             ) : (
               <>
-                <h2 className="mb-4 text-2xl font-bold text-white">{t('Content.overview')}</h2>
+                <h2 className="mb-4 text-2xl font-bold text-white">{t("Content.overview")}</h2>
                 <p className="text-lg leading-relaxed text-gray-300">
-                  {details.overview === '' ? t('Content.langugeNotSupported') : details.overview}
+                  {details.overview == "" ? t("Content.langugeNotSupported") : details.overview}
                 </p>
               </>
             )}
@@ -213,17 +201,19 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
           <div className="rounded-lg bg-gray-800 p-6">
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-400">{t('Content.status')}</h3>
+                <h3 className="text-sm font-medium text-gray-400">{t("Content.status")}</h3>
                 <p className="text-white">{getStatusTranslation(details.status)}</p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-400">{t('Content.releaseDate')}</h3>
+                <h3 className="text-sm font-medium text-gray-400">{t("Content.releaseDate")}</h3>
                 <p className="text-white">
                   {details.release_date || details.first_air_date}
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-400">{t('Content.originalLanguage')}</h3>
+                <h3 className="text-sm font-medium text-gray-400">
+                  {t("Content.originalLanguage")}
+                </h3>
                 <p className="text-white">
                   {new Intl.DisplayNames([i18n.language], { type: 'language' }).of(
                     details.original_language
@@ -234,53 +224,39 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
           </div>
         </div>
 
-        {/* Download/Watch Section */}
-        {mediaLinks && mediaLinks.download_links.length > 0 && (
-          <div className="mt-12">
-            <h2 className="mb-6 text-2xl font-bold text-white">
-              {t('Content.downloadWatchLinks')}
-            </h2>
-
-            <div className="space-y-4">
-              {/* Download Links */}
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-gray-400">{t('Content.downloadLinks')}</h3>
-                {mediaLinks.download_links.map((link: any) => (
+        <div className="mt-12 text-center">
+          <h2 className="text-2xl font-bold text-white">DOWNLOAD & WATCH</h2>
+          <div className="mt-4 space-y-6">
+            {details.downloadLinks?.map((link, index) => (
+              <div key={index} className="space-y-2">
+                <h3 className="text-white">{link.quality}</h3>
+                <div className="flex gap-4 justify-center">
                   <a
-                    key={link.quality}
                     href={link.link}
-                    className="block rounded-lg bg-gray-800 px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-700"
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
                   >
-                    {t('Content.download')} - {link.quality}
+                    Download
                   </a>
-                ))}
-              </div>
-
-              {/* Watch Links */}
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-gray-400">{t('Content.watchLinks')}</h3>
-                {mediaLinks.watch_links.map((link: any) => (
                   <a
-                    key={link.quality}
-                    href={link.link}
-                    className="block rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
+                    href={details.watchLinks?.[index]?.link}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700"
                   >
-                    {t('Content.watch')} - {link.quality}
+                    Watch
                   </a>
-                ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        )}
+        </div>
 
         {details.similar?.results && details.similar.results.length > 0 && (
           <div className="mt-12">
             <h2 className="mb-6 text-2xl font-bold text-white">
-              {t('Content.similarShows')}
+              {t("Content.similarShows")}
             </h2>
             <MediaGrid
               items={details.similar.results.slice(0, 10)}

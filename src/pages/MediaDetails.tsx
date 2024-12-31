@@ -15,56 +15,38 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
   const location = useLocation();
   const [details, setDetails] = useState(location.state?.media || null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [downloadLinks, setDownloadLinks] = useState([]);
-  const [watchLinks, setWatchLinks] = useState([]);
+  const [error, setError] = useState('');
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [isWatching, setIsWatching] = useState(false);
   const [seasonDetails, setSeasonDetails] = useState(null);
+  const [downloadLinks, setDownloadLinks] = useState([]);
+  const [watchLinks, setWatchLinks] = useState([]);
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-
-  const getStatusTranslation = (status: string): string => {
-    const statusTranslations = t("Content.stautsmovies", { returnObjects: true }) as string[];
-
-    switch (status) {
-      case "Returning Series":
-        return statusTranslations[0];
-      case "Ended":
-        return statusTranslations[2];
-      case "Released":
-        return statusTranslations[3];
-      default:
-        return statusTranslations[1]; // Fallback status
-    }
-  };
 
   useEffect(() => {
     const loadDetails = async () => {
       if (!id) return;
       try {
         setLoading(true);
-        setError("");
-
-        // Fetch media details
+        setError('');
         const data = await fetchDetails(mediaType, id, i18n.language);
         setDetails(data);
-
-        // Fetch season details if it's a TV show
-        if (mediaType === 'tv') {
-          const seasonData = await fetchSeasonDetails(id, selectedSeason, "en");
-          setSeasonDetails(seasonData);
-        }
 
         // Fetch download and watch links
         const response = await fetch('https://siamstv.vercel.app/tv/movies.json');
         const movies = await response.json();
-        const matchedMovie = movies.find((movie) => movie.id === id);
+        const movie = movies.find((movie: any) => movie.id === id);
 
-        if (matchedMovie) {
-          setDownloadLinks(matchedMovie.download_links || []);
-          setWatchLinks(matchedMovie.watch_links || []);
+        if (movie) {
+          setDownloadLinks(movie.download_links || []);
+          setWatchLinks(movie.watch_links || []);
+        }
+
+        if (mediaType === 'tv') {
+          const seasonData = await fetchSeasonDetails(id, selectedSeason, 'en');
+          setSeasonDetails(seasonData);
         }
       } catch (error) {
         console.error('Error loading details:', error);
@@ -97,7 +79,6 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Header Section */}
       <div
         className="relative h-[60vh] bg-cover bg-center"
         style={{
@@ -143,13 +124,12 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               onClick={() => setIsWatching(true)}
               className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
             >
-              {t("Content.watchTitle")}
+              {t('Content.watchTitle')}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
@@ -158,7 +138,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                 {mediaType !== 'movie' && (
                   <div className="flex-col items-center gap-2">
                     <p className="text-sm py-4 px-2 font-medium text-white text-wrap">
-                      {t("Content.shoseEpisodes")}
+                      {t('Content.shoseEpisodes')}
                     </p>
                     <div className="flex gap-4">
                       <select
@@ -173,14 +153,16 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                           { length: details.number_of_seasons || 0 },
                           (_, i) => (
                             <option key={i + 1} value={i + 1}>
-                              {t("Content.Season")} {details.selectSeason} {i + 1}
+                              {t('Content.Season')} {i + 1}
                             </option>
                           )
                         )}
                       </select>
                       <select
                         value={selectedEpisode}
-                        onChange={(e) => setSelectedEpisode(Number(e.target.value))}
+                        onChange={(e) =>
+                          setSelectedEpisode(Number(e.target.value))
+                        }
                         className="rounded-lg bg-gray-800 px-4 py-2 text-white"
                       >
                         {seasonDetails?.episodes?.map((episode) => (
@@ -193,7 +175,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                   </div>
                 )}
                 <p className="text-sm py-4 px-2 font-medium text-white text-wrap">
-                  {t("Content.shoseServer")}
+                  {t('Content.shoseServer')}
                 </p>
                 <ServerSelector
                   mediaType={mediaType}
@@ -204,10 +186,12 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               </div>
             ) : (
               <>
-                <h2 className="mb-4 text-2xl font-bold text-white">{t("Content.overview")}</h2>
+                <h2 className="mb-4 text-2xl font-bold text-white">
+                  {t('Content.overview')}
+                </h2>
                 <p className="text-lg leading-relaxed text-gray-300">
-                  {details.overview === ""
-                    ? t("Content.langugeNotSupported")
+                  {details.overview === ''
+                    ? t('Content.langugeNotSupported')
                     : details.overview}
                 </p>
               </>
@@ -216,47 +200,29 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
           <div className="rounded-lg bg-gray-800 p-6">
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-400">{t("Content.status")}</h3>
-                <p className="text-white">
-                  {getStatusTranslation(details.status)}
-                </p>
+                <h3 className="text-sm font-medium text-gray-400">
+                  {t('Content.status')}
+                </h3>
+                <p className="text-white">{details.status}</p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-400">{t("Content.releaseDate")}</h3>
+                <h3 className="text-sm font-medium text-gray-400">
+                  {t('Content.releaseDate')}
+                </h3>
                 <p className="text-white">
                   {details.release_date || details.first_air_date}
                 </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-400">
-                  {t("Content.originalLanguage")}
+                  {t('Content.originalLanguage')}
                 </h3>
-                <p className="text-white">
-                  {new Intl.DisplayNames([i18n.language], { type: 'language' }).of(
-                    details.original_language
-                  )}
-                </p>
+                <p className="text-white">{details.original_language}</p>
               </div>
-              {mediaType === 'tv' && details.number_of_seasons && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-400">
-                    {t("Content.Season")}
-                  </h3>
-                  <p
-                    dir={`${i18n.language === "ar" ? "rtl" : "ltr"}`}
-                    className={`text-white text-left`}
-                  >
-                    {details.number_of_seasons} {t("Content.Season")},{" "}
-                    {details.number_of_episodes}
-                    {t("Content.episodes")}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Download & Watch Section */}
         {downloadLinks.length > 0 || watchLinks.length > 0 ? (
           <div className="mt-12 text-center">
             <h2 className="mb-6 text-2xl font-bold text-white">
@@ -269,7 +235,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                   href={link.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+                  className="rounded-lg bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700"
                 >
                   Download ({link.quality})
                 </a>
@@ -287,13 +253,29 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               ))}
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="mt-12 rounded-lg bg-gray-800 p-6 text-center">
+            <h2 className="text-xl font-semibold text-white">
+              No download or watch links are given for this movie/series.
+            </h2>
+            <p className="mt-4 text-gray-300">
+              But you can still watch the movie.
+            </p>
+            <a
+              href="https://docs.google.com/forms/d/1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+            >
+              Click here to request Download/Watch links
+            </a>
+          </div>
+        )}
 
-        {/* Similar Content */}
         {details.similar?.results && details.similar.results.length > 0 && (
           <div className="mt-12">
             <h2 className="mb-6 text-2xl font-bold text-white">
-              {t("Content.similarShows")}
+              {t('Content.similarShows')}
             </h2>
             <MediaGrid
               items={details.similar.results.slice(0, 10)}

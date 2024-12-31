@@ -131,21 +131,46 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
             >
               {t('Content.watchTitle')}
             </button>
+          </div>
+        </div>
+      </div>
 
-            {/* Display download options */}
-            {mediaLinks && mediaLinks.download_links && (
-              <div className="mt-6">
-                <h3 className="text-xl font-semibold text-white">{t('Content.downloadOptions')}</h3>
-                <div className="flex gap-4">
+      {/* Download & Watch Links Section */}
+      {mediaLinks && (mediaLinks.download_links || mediaLinks.watch_links) && (
+        <div className="mx-auto max-w-7xl px-4 py-8 bg-gray-800 rounded-lg mt-8">
+          <h2 className="text-2xl font-semibold text-white mb-6">{t('Content.downloadWatchSection')}</h2>
+          <div className="flex flex-col space-y-6">
+            {mediaLinks.download_links && (
+              <div>
+                <h3 className="text-xl text-white">{t('Content.downloadOptions')}</h3>
+                <div className="flex gap-4 flex-wrap">
                   {mediaLinks.download_links.map((link: any) => (
                     <a
                       key={link.quality}
                       href={link.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-gray-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-700"
+                      className="inline-flex items-center gap-2 rounded-lg bg-gray-700 px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-600"
                     >
-                      {t('Content.download')} {link.quality}
+                      {link.quality}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+            {mediaLinks.watch_links && (
+              <div>
+                <h3 className="text-xl text-white">{t('Content.watchOptions')}</h3>
+                <div className="flex gap-4 flex-wrap">
+                  {mediaLinks.watch_links.map((link: any) => (
+                    <a
+                      key={link.quality}
+                      href={link.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg bg-gray-700 px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-600"
+                    >
+                      Watch {link.quality}
                     </a>
                   ))}
                 </div>
@@ -153,7 +178,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
             )}
           </div>
         </div>
-      </div>
+      )}
 
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-3">

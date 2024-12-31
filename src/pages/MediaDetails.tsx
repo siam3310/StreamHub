@@ -7,7 +7,7 @@ import ServerSelector from '../components/ServerSelector';
 import { useTranslation } from 'react-i18next';
 
 interface MediaDetailsProps {
-  mediaType: 'movie' | 'tv' | "anime";
+  mediaType: 'movie' | 'tv' | 'anime';
 }
 
 export default function MediaDetails({ mediaType }: MediaDetailsProps) {
@@ -16,16 +16,14 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
   const [details, setDetails] = useState(location.state?.media || null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [downloadLinks, setDownloadLinks] = useState([]);
+  const [watchLinks, setWatchLinks] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [isWatching, setIsWatching] = useState(false);
   const [seasonDetails, setSeasonDetails] = useState(null);
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-
-  if (id === "225385") {
-    navigate("/")
-  }
 
   const getStatusTranslation = (status: string): string => {
     const statusTranslations = t("Content.stautsmovies", { returnObjects: true }) as string[];
@@ -48,12 +46,25 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
       try {
         setLoading(true);
         setError("");
+
+        // Fetch media details
         const data = await fetchDetails(mediaType, id, i18n.language);
         setDetails(data);
 
+        // Fetch season details if it's a TV show
         if (mediaType === 'tv') {
           const seasonData = await fetchSeasonDetails(id, selectedSeason, "en");
           setSeasonDetails(seasonData);
+        }
+
+        // Fetch download and watch links
+        const response = await fetch('https://siamstv.vercel.app/tv/movies.json');
+        const movies = await response.json();
+        const matchedMovie = movies.find((movie) => movie.id === id);
+
+        if (matchedMovie) {
+          setDownloadLinks(matchedMovie.download_links || []);
+          setWatchLinks(matchedMovie.watch_links || []);
         }
       } catch (error) {
         console.error('Error loading details:', error);
@@ -86,6 +97,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
 
   return (
     <div className="min-h-screen bg-gray-900">
+      {/* Header Section */}
       <div
         className="relative h-[60vh] bg-cover bg-center"
         style={{
@@ -137,6 +149,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
@@ -144,7 +157,9 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               <div className="space-y-4">
                 {mediaType !== 'movie' && (
                   <div className="flex-col items-center gap-2">
-                    <p className='text-sm py-4 px-2 font-medium text-white text-wrap'>{t("Content.shoseEpisodes")}</p>
+                    <p className="text-sm py-4 px-2 font-medium text-white text-wrap">
+                      {t("Content.shoseEpisodes")}
+                    </p>
                     <div className="flex gap-4">
                       <select
                         value={selectedSeason}
@@ -158,7 +173,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                           { length: details.number_of_seasons || 0 },
                           (_, i) => (
                             <option key={i + 1} value={i + 1}>
-                              {t("Content.Season")}  {details.selectSeason} {i + 1}
+                              {t("Content.Season")} {details.selectSeason} {i + 1}
                             </option>
                           )
                         )}
@@ -169,10 +184,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                         className="rounded-lg bg-gray-800 px-4 py-2 text-white"
                       >
                         {seasonDetails?.episodes?.map((episode) => (
-                          <option
-                            key={episode.id}
-                            value={episode.episode_number}
-                          >
+                          <option key={episode.id} value={episode.episode_number}>
                             {episode.name}
                           </option>
                         ))}
@@ -180,8 +192,9 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                     </div>
                   </div>
                 )}
-                <p className='text-sm py-4 px-2 font-medium text-white text-wrap'>{t("Content.shoseServer")}</p>
-
+                <p className="text-sm py-4 px-2 font-medium text-white text-wrap">
+                  {t("Content.shoseServer")}
+                </p>
                 <ServerSelector
                   mediaType={mediaType}
                   mediaId={id!}
@@ -193,7 +206,9 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               <>
                 <h2 className="mb-4 text-2xl font-bold text-white">{t("Content.overview")}</h2>
                 <p className="text-lg leading-relaxed text-gray-300">
-                  {details.overview == "" ? t("Content.langugeNotSupported") : details.overview}
+                  {details.overview === ""
+                    ? t("Content.langugeNotSupported")
+                    : details.overview}
                 </p>
               </>
             )}
@@ -202,7 +217,9 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
             <div className="space-y-4">
               <div>
                 <h3 className="text-sm font-medium text-gray-400">{t("Content.status")}</h3>
-                <p className="text-white">{getStatusTranslation(details.status)}</p>
+                <p className="text-white">
+                  {getStatusTranslation(details.status)}
+                </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-400">{t("Content.releaseDate")}</h3>
@@ -220,39 +237,59 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                   )}
                 </p>
               </div>
+              {mediaType === 'tv' && details.number_of_seasons && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-400">
+                    {t("Content.Season")}
+                  </h3>
+                  <p
+                    dir={`${i18n.language === "ar" ? "rtl" : "ltr"}`}
+                    className={`text-white text-left`}
+                  >
+                    {details.number_of_seasons} {t("Content.Season")},{" "}
+                    {details.number_of_episodes}
+                    {t("Content.episodes")}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="mt-12 text-center">
-          <h2 className="text-2xl font-bold text-white">DOWNLOAD & WATCH</h2>
-          <div className="mt-4 space-y-6">
-            {details.download_links?.map((link, index) => (
-              <div key={index} className="space-y-2">
-                <h3 className="text-white">{link.quality}</h3>
-                <div className="flex gap-4 justify-center">
-                  <a
-                    href={link.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
-                  >
-                    Download
-                  </a>
-                  <a
-                    href={details.watch_links?.[index]?.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700"
-                  >
-                    Watch
-                  </a>
-                </div>
-              </div>
-            ))}
+        {/* Download & Watch Section */}
+        {downloadLinks.length > 0 || watchLinks.length > 0 ? (
+          <div className="mt-12 text-center">
+            <h2 className="mb-6 text-2xl font-bold text-white">
+              DOWNLOAD & WATCH
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {downloadLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+                >
+                  Download ({link.quality})
+                </a>
+              ))}
+              {watchLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700"
+                >
+                  Watch ({link.quality})
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
 
+        {/* Similar Content */}
         {details.similar?.results && details.similar.results.length > 0 && (
           <div className="mt-12">
             <h2 className="mb-6 text-2xl font-bold text-white">

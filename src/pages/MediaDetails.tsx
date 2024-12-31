@@ -102,12 +102,18 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="mx-auto max-w-7xl">
-            <h1 className="text-4xl font-bold text-white">{details.title || details.name}</h1>
-            {details.tagline && <p className="mt-2 text-xl text-gray-300">{details.tagline}</p>}
+            <h1 className="text-4xl font-bold text-white">
+              {details.title || details.name}
+            </h1>
+            {details.tagline && (
+              <p className="mt-2 text-xl text-gray-300">{details.tagline}</p>
+            )}
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-1">
                 <Star className="h-5 w-5 text-yellow-400" />
-                <span className="text-white">{details.vote_average.toFixed(1)}</span>
+                <span className="text-white">
+                  {details.vote_average.toFixed(1)}
+                </span>
               </div>
               {details.runtime && (
                 <div className="flex items-center gap-1">
@@ -118,7 +124,10 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               {details.genres && (
                 <div className="flex flex-wrap gap-2">
                   {details.genres.map((genre) => (
-                    <span key={genre.id} className="rounded-full bg-red-600 px-3 py-1 text-sm text-white">
+                    <span
+                      key={genre.id}
+                      className="rounded-full bg-red-600 px-3 py-1 text-sm text-white"
+                    >
                       {genre.name}
                     </span>
                   ))}
@@ -135,51 +144,6 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
         </div>
       </div>
 
-      {/* Download & Watch Links Section */}
-      {mediaLinks && (mediaLinks.download_links || mediaLinks.watch_links) && (
-        <div className="mx-auto max-w-7xl px-4 py-8 bg-gray-800 rounded-lg mt-8">
-          <h2 className="text-2xl font-semibold text-white mb-6">{t('Content.downloadWatchSection')}</h2>
-          <div className="flex flex-col space-y-6">
-            {mediaLinks.download_links && (
-              <div>
-                <h3 className="text-xl text-white">{t('Content.downloadOptions')}</h3>
-                <div className="flex gap-4 flex-wrap">
-                  {mediaLinks.download_links.map((link: any) => (
-                    <a
-                      key={link.quality}
-                      href={link.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-gray-700 px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-600"
-                    >
-                      {link.quality}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-            {mediaLinks.watch_links && (
-              <div>
-                <h3 className="text-xl text-white">{t('Content.watchOptions')}</h3>
-                <div className="flex gap-4 flex-wrap">
-                  {mediaLinks.watch_links.map((link: any) => (
-                    <a
-                      key={link.quality}
-                      href={link.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-gray-700 px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-600"
-                    >
-                      Watch {link.quality}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
@@ -187,7 +151,9 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               <div className="space-y-4">
                 {mediaType !== 'movie' && (
                   <div className="flex-col items-center gap-2">
-                    <p className="text-sm py-4 px-2 font-medium text-white text-wrap">{t('Content.shoseEpisodes')}</p>
+                    <p className="text-sm py-4 px-2 font-medium text-white text-wrap">
+                      {t('Content.shoseEpisodes')}
+                    </p>
 
                     <div className="flex gap-4">
                       <select
@@ -198,11 +164,14 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                         }}
                         className="rounded-lg bg-gray-800 px-4 py-2 text-white"
                       >
-                        {Array.from({ length: details.number_of_seasons || 0 }, (_, i) => (
-                          <option key={i + 1} value={i + 1}>
-                            {t('Content.Season')} {i + 1}
-                          </option>
-                        ))}
+                        {Array.from(
+                          { length: details.number_of_seasons || 0 },
+                          (_, i) => (
+                            <option key={i + 1} value={i + 1}>
+                              {t('Content.Season')} {i + 1}
+                            </option>
+                          )
+                        )}
                       </select>
                       <select
                         value={selectedEpisode}
@@ -210,7 +179,10 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                         className="rounded-lg bg-gray-800 px-4 py-2 text-white"
                       >
                         {seasonDetails?.episodes?.map((episode) => (
-                          <option key={episode.id} value={episode.episode_number}>
+                          <option
+                            key={episode.id}
+                            value={episode.episode_number}
+                          >
                             {episode.name}
                           </option>
                         ))}
@@ -218,7 +190,9 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                     </div>
                   </div>
                 )}
-                <p className="text-sm py-4 px-2 font-medium text-white text-wrap">{t('Content.shoseServer')}</p>
+                <p className="text-sm py-4 px-2 font-medium text-white text-wrap">
+                  {t('Content.shoseServer')}
+                </p>
 
                 <ServerSelector
                   mediaType={mediaType}
@@ -244,31 +218,74 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-400">{t('Content.releaseDate')}</h3>
-                <p className="text-white">{details.release_date || details.first_air_date}</p>
+                <p className="text-white">
+                  {details.release_date || details.first_air_date}
+                </p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-400">{t('Content.originalLanguage')}</h3>
                 <p className="text-white">
-                  {new Intl.DisplayNames([i18n.language], { type: 'language' }).of(details.original_language)}
+                  {new Intl.DisplayNames([i18n.language], { type: 'language' }).of(
+                    details.original_language
+                  )}
                 </p>
               </div>
-              {mediaType === 'tv' && details.number_of_seasons && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-400">{t('Content.Season')}</h3>
-                  <p dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} className="text-white text-left">
-                    {details.number_of_seasons} {t('Content.Season')},{' '}
-                    {details.number_of_episodes} {t('Content.episodes')}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
+        {/* Download/Watch Section */}
+        {mediaLinks && mediaLinks.download_links.length > 0 && (
+          <div className="mt-12">
+            <h2 className="mb-6 text-2xl font-bold text-white">
+              {t('Content.downloadWatchLinks')}
+            </h2>
+
+            <div className="space-y-4">
+              {/* Download Links */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-gray-400">{t('Content.downloadLinks')}</h3>
+                {mediaLinks.download_links.map((link: any) => (
+                  <a
+                    key={link.quality}
+                    href={link.link}
+                    className="block rounded-lg bg-gray-800 px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-700"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('Content.download')} - {link.quality}
+                  </a>
+                ))}
+              </div>
+
+              {/* Watch Links */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-gray-400">{t('Content.watchLinks')}</h3>
+                {mediaLinks.watch_links.map((link: any) => (
+                  <a
+                    key={link.quality}
+                    href={link.link}
+                    className="block rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('Content.watch')} - {link.quality}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {details.similar?.results && details.similar.results.length > 0 && (
           <div className="mt-12">
-            <h2 className="mb-6 text-2xl font-bold text-white">{t('Content.similarShows')}</h2>
-            <MediaGrid items={details.similar.results.slice(0, 10)} mediaType={mediaType} />
+            <h2 className="mb-6 text-2xl font-bold text-white">
+              {t('Content.similarShows')}
+            </h2>
+            <MediaGrid
+              items={details.similar.results.slice(0, 10)}
+              mediaType={mediaType}
+            />
           </div>
         )}
       </div>

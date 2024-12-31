@@ -227,7 +227,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
         <div className="mt-12 text-center">
           <h2 className="text-2xl font-bold text-white">DOWNLOAD & WATCH</h2>
           <div className="mt-4 space-y-6">
-            {details.downloadLinks?.map((link, index) => (
+            {details.download_links?.map((link, index) => (
               <div key={index} className="space-y-2">
                 <h3 className="text-white">{link.quality}</h3>
                 <div className="flex gap-4 justify-center">
@@ -240,7 +240,7 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
                     Download
                   </a>
                   <a
-                    href={details.watchLinks?.[index]?.link}
+                    href={details.watch_links?.[index]?.link}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700"

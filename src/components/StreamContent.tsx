@@ -8,31 +8,63 @@ interface StreamContentProps {
 
 const servers = [
   {
-    name: 'VidSrc',
+    name: 'MovieAPI (Ads)',
     getUrl: (id: string, season?: number, episode?: number) => {
+      const baseUrl = 'https://moviesapi.club/';
       if (season && episode) {
-        return `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`;
+        return `${baseUrl}tv/${id}-${season}-${episode}`;
       }
-      return `https://vidsrc.to/embed/movie/${id}`;
+      return `${baseUrl}movie/${id}`;
     },
   },
   {
-    name: 'VidSrc.me',
+    name: 'embed.su',
     getUrl: (id: string, season?: number, episode?: number) => {
+      const baseUrl = 'https://embed.su/embed/';
       if (season && episode) {
-        return `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`;
+        return `${baseUrl}tv/${id}/${season}/${episode}`;
       }
-      return `https://vidsrc.me/embed/movie?tmdb=${id}`;
+      return `${baseUrl}movie/${id}`;
     },
   },
   {
-    name: 'SuperEmbed',
+    name: 'Smashy Stream',
     getUrl: (id: string, season?: number, episode?: number) => {
-      const baseUrl = 'https://multiembed.mov/directstream.php';
+      const baseUrl = 'https://player.smashy.stream/';
       if (season && episode) {
-        return `${baseUrl}?video_id=${id}&tmdb=1&season=${season}&episode=${episode}`;
+        return `${baseUrl}tv/${id}?s=${season}&e=${episode}`;
       }
-      return `${baseUrl}?video_id=${id}&tmdb=1`;
+      return `${baseUrl}movie/${id}?playerList=D|SM`;
+    },
+  },
+  {
+    name: 'VidSrc Pro',
+    getUrl: (id: string, season?: number, episode?: number) => {
+      const baseUrl = 'https://vidsrc.pro/embed/';
+      if (season && episode) {
+        return `${baseUrl}tv/${id}/${season}/${episode}`;
+      }
+      return `${baseUrl}movie/${id}`;
+    },
+  },
+  {
+    name: 'VidSrc CC',
+    getUrl: (id: string, season?: number, episode?: number) => {
+      const baseUrl = 'https://vidsrc.cc/v2/embed/';
+      if (season && episode) {
+        return `${baseUrl}tv/${id}/${season}/${episode}`;
+      }
+      return `${baseUrl}movie/${id}`;
+    },
+  },
+  {
+    name: 'AutoEmbed',
+    getUrl: (id: string, season?: number, episode?: number) => {
+      const baseUrl = 'https://player.autoembed.cc/embed/';
+      if (season && episode) {
+        return `${baseUrl}tv/${id}/${season}/${episode}`;
+      }
+      return `${baseUrl}movie/${id}`;
     },
   },
 ];
@@ -63,7 +95,6 @@ export default function StreamContent({ mediaType }: StreamContentProps) {
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         className="rounded-lg"
         name="iframeParent"
-       
       />
     );
   };

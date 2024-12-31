@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useParams, useLocation, useRoutes, Router, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { Clock, Star } from 'lucide-react';
 import { fetchDetails, fetchSeasonDetails } from '../services/api';
 import MediaGrid from '../components/MediaGrid';
 import ServerSelector from '../components/ServerSelector';
 import { useTranslation } from 'react-i18next';
 
-
 interface MediaDetailsProps {
-  mediaType: 'movie' | 'tv'|"anime";
+  mediaType: 'movie' | 'tv' | 'anime';
 }
 
 export default function MediaDetails({ mediaType }: MediaDetailsProps) {
@@ -16,51 +15,51 @@ export default function MediaDetails({ mediaType }: MediaDetailsProps) {
   const location = useLocation();
   const [details, setDetails] = useState(location.state?.media || null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [isWatching, setIsWatching] = useState(false);
   const [seasonDetails, setSeasonDetails] = useState(null);
+  const [mediaLinks, setMediaLinks] = useState<any>(null); // To store download/watch links
   const { t, i18n } = useTranslation();
-  const navigate=useNavigate()
-  if (id==="225385") {
-navigate("/")
+  const navigate = useNavigate();
 
-
-    
+  if (id === '225385') {
+    navigate('/');
   }
-console.log(mediaType)
+
   const getStatusTranslation = (status: string): string => {
-    const statusTranslations = t("Content.stautsmovies", { returnObjects: true }) as string[];
-  
+    const statusTranslations = t('Content.stautsmovies', { returnObjects: true }) as string[];
+
     switch (status) {
-      case "Returning Series":
+      case 'Returning Series':
         return statusTranslations[0];
-      case "Ended":
+      case 'Ended':
         return statusTranslations[2];
-      case "Released":
+      case 'Released':
         return statusTranslations[3];
       default:
         return statusTranslations[1]; // Fallback status
     }
   };
-  
-  // Usage in JSX
-
-  
-
 
   useEffect(() => {
     const loadDetails = async () => {
       if (!id) return;
       try {
         setLoading(true);
-        setError("");
+        setError('');
         const data = await fetchDetails(mediaType, id, i18n.language);
         setDetails(data);
-        
+
+        // Fetch download and watch links from the provided JSON URL
+        const res = await fetch('https://siamstv.vercel.app/tv/movies.json');
+        const jsonData = await res.json();
+        const mediaData = jsonData.find((item: any) => item.id === id);
+        setMediaLinks(mediaData); // Store the media links
+
         if (mediaType === 'tv') {
-          const seasonData = await fetchSeasonDetails(id, selectedSeason,"en");
+          const seasonData = await fetchSeasonDetails(id, selectedSeason, 'en');
           setSeasonDetails(seasonData);
         }
       } catch (error) {
@@ -103,18 +102,12 @@ console.log(mediaType)
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="mx-auto max-w-7xl">
-            <h1 className="text-4xl font-bold text-white">
-              {details.title || details.name}
-            </h1>
-            {details.tagline && (
-              <p className="mt-2 text-xl text-gray-300">{details.tagline}</p>
-            )}
+            <h1 className="text-4xl font-bold text-white">{details.title || details.name}</h1>
+            {details.tagline && <p className="mt-2 text-xl text-gray-300">{details.tagline}</p>}
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-1">
                 <Star className="h-5 w-5 text-yellow-400" />
-                <span className="text-white">
-                  {details.vote_average.toFixed(1)}
-                </span>
+                <span className="text-white">{details.vote_average.toFixed(1)}</span>
               </div>
               {details.runtime && (
                 <div className="flex items-center gap-1">
@@ -125,14 +118,10 @@ console.log(mediaType)
               {details.genres && (
                 <div className="flex flex-wrap gap-2">
                   {details.genres.map((genre) => (
-                    <span
-                      key={genre.id}
-                      className="rounded-full bg-red-600 px-3 py-1 text-sm text-white"
-                    >
+                    <span key={genre.id} className="rounded-full bg-red-600 px-3 py-1 text-sm text-white">
                       {genre.name}
                     </span>
                   ))}
-                  
                 </div>
               )}
             </div>
@@ -140,8 +129,28 @@ console.log(mediaType)
               onClick={() => setIsWatching(true)}
               className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
             >
-              {t("Content.watchTitle")}
+              {t('Content.watchTitle')}
             </button>
+
+            {/* Display download options */}
+            {mediaLinks && mediaLinks.download_links && (
+              <div className="mt-6">
+                <h3 className="text-xl font-semibold text-white">{t('Content.downloadOptions')}</h3>
+                <div className="flex gap-4">
+                  {mediaLinks.download_links.map((link: any) => (
+                    <a
+                      key={link.quality}
+                      href={link.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg bg-gray-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-gray-700"
+                    >
+                      {t('Content.download')} {link.quality}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -153,45 +162,38 @@ console.log(mediaType)
               <div className="space-y-4">
                 {mediaType !== 'movie' && (
                   <div className="flex-col items-center gap-2">
-                    <p className='text-sm py-4 px-2 font-medium text-white text-wrap'>{t("Content.shoseEpisodes")}</p>
+                    <p className="text-sm py-4 px-2 font-medium text-white text-wrap">{t('Content.shoseEpisodes')}</p>
 
-                  
-                  <div className="flex gap-4">
-                    <select
-                      value={selectedSeason}
-                      onChange={(e) => {
-                        setSelectedSeason(Number(e.target.value));
-                        setSelectedEpisode(1);
-                      }}
-                      className="rounded-lg bg-gray-800 px-4 py-2 text-white"
-                    >
-                      {Array.from(
-                        { length: details.number_of_seasons || 0 },
-                        (_, i) => (
+                    <div className="flex gap-4">
+                      <select
+                        value={selectedSeason}
+                        onChange={(e) => {
+                          setSelectedSeason(Number(e.target.value));
+                          setSelectedEpisode(1);
+                        }}
+                        className="rounded-lg bg-gray-800 px-4 py-2 text-white"
+                      >
+                        {Array.from({ length: details.number_of_seasons || 0 }, (_, i) => (
                           <option key={i + 1} value={i + 1}>
-                           {t("Content.Season")}  {details.selectSeason} {i + 1}
+                            {t('Content.Season')} {i + 1}
                           </option>
-                        )
-                      )}
-                    </select>
-                    <select
-                      value={selectedEpisode}
-                      onChange={(e) => setSelectedEpisode(Number(e.target.value))}
-                      className="rounded-lg bg-gray-800 px-4 py-2 text-white"
-                    >
-                      {seasonDetails?.episodes?.map((episode) => (
-                        <option
-                          key={episode.id}
-                          value={episode.episode_number}
-                        >
-                          {episode.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                        ))}
+                      </select>
+                      <select
+                        value={selectedEpisode}
+                        onChange={(e) => setSelectedEpisode(Number(e.target.value))}
+                        className="rounded-lg bg-gray-800 px-4 py-2 text-white"
+                      >
+                        {seasonDetails?.episodes?.map((episode) => (
+                          <option key={episode.id} value={episode.episode_number}>
+                            {episode.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 )}
-                <p className='text-sm py-4 px-2 font-medium text-white text-wrap'>{t("Content.shoseServer")}</p>
+                <p className="text-sm py-4 px-2 font-medium text-white text-wrap">{t('Content.shoseServer')}</p>
 
                 <ServerSelector
                   mediaType={mediaType}
@@ -202,9 +204,9 @@ console.log(mediaType)
               </div>
             ) : (
               <>
-                <h2 className="mb-4 text-2xl font-bold text-white">{t("Content.overview")}</h2>
+                <h2 className="mb-4 text-2xl font-bold text-white">{t('Content.overview')}</h2>
                 <p className="text-lg leading-relaxed text-gray-300">
-                  {details.overview==""?t("Content.langugeNotSupported"):details.overview}
+                  {details.overview === '' ? t('Content.langugeNotSupported') : details.overview}
                 </p>
               </>
             )}
@@ -212,30 +214,25 @@ console.log(mediaType)
           <div className="rounded-lg bg-gray-800 p-6">
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-400">{t("Content.status")}</h3>
-                <p className="text-white">{getStatusTranslation(details.status)}</p>              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-400">{t("Content.releaseDate")}</h3>
-                <p className="text-white">
-                  {details.release_date || details.first_air_date}
-                </p>
+                <h3 className="text-sm font-medium text-gray-400">{t('Content.status')}</h3>
+                <p className="text-white">{getStatusTranslation(details.status)}</p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-400">
-                {t("Content.originalLanguage")}
-                </h3>
+                <h3 className="text-sm font-medium text-gray-400">{t('Content.releaseDate')}</h3>
+                <p className="text-white">{details.release_date || details.first_air_date}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-400">{t('Content.originalLanguage')}</h3>
                 <p className="text-white">
-                  {new Intl.DisplayNames([i18n.language], { type: 'language' }).of(
-                    details.original_language
-                  )}
+                  {new Intl.DisplayNames([i18n.language], { type: 'language' }).of(details.original_language)}
                 </p>
               </div>
               {mediaType === 'tv' && details.number_of_seasons && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-400">{t("Content.Season")}</h3>
-                  <p dir={`${i18n.language=== "ar"?'rtl':'ltr'}`}  className={`text-white text-left`}>
-                    {details.number_of_seasons} {t("Content.Season")},{' '}
-                    {details.number_of_episodes}{t("Content.episodes")}
+                  <h3 className="text-sm font-medium text-gray-400">{t('Content.Season')}</h3>
+                  <p dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} className="text-white text-left">
+                    {details.number_of_seasons} {t('Content.Season')},{' '}
+                    {details.number_of_episodes} {t('Content.episodes')}
                   </p>
                 </div>
               )}
@@ -245,13 +242,8 @@ console.log(mediaType)
 
         {details.similar?.results && details.similar.results.length > 0 && (
           <div className="mt-12">
-            <h2 className="mb-6 text-2xl font-bold text-white">
-            {t("Content.similarShows")}  
-            </h2>
-            <MediaGrid
-              items={details.similar.results.slice(0, 10)}
-              mediaType={mediaType}
-            />
+            <h2 className="mb-6 text-2xl font-bold text-white">{t('Content.similarShows')}</h2>
+            <MediaGrid items={details.similar.results.slice(0, 10)} mediaType={mediaType} />
           </div>
         )}
       </div>

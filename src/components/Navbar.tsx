@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Film, Home, Menu,  Tv, Zap, X } from 'lucide-react';
+import { Film, Home, Menu,  Tv, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import SearchBar from './SearchBar';
@@ -28,8 +28,7 @@ export default function Navbar() {
     // Map i18n language to API language
     if (lang === 'en') setLanguge('en-US');
     else if (lang === 'es') setLanguge('es-ES');
-    else if (lang === 'fr') setLanguge('fr-FR');
-    else if (lang === 'ar') setLanguge('ar-AR');
+    else if (lang === 'bn') setLanguge('bn-BN');
   }, [lang]);
  // Re-run when languge, movies, or tv changes
 
@@ -53,7 +52,7 @@ export default function Navbar() {
     { path: '/', icon: Home, label: t('nav.home') },
     { path: '/movies', icon: Film, label: t('nav.movies'), categories: movieGenres, type: 'movie' },
     { path: '/series', icon: Tv, label: t('nav.series'), categories: tvGenres, type: 'tv' },
-    { path: '/anime', icon: Zap, label: t('nav.anime') },
+
   ];
 
   return (

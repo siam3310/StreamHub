@@ -4,16 +4,14 @@ import { Globe } from 'lucide-react';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
 ];
 
 export default function LanguageSelector() {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const changeLanguage = (lng: string) => {
+  const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
     setIsOpen(false);
   };
@@ -25,7 +23,7 @@ export default function LanguageSelector() {
         onClick={() => setIsOpen(!isOpen)}
       >
         <Globe className="h-5 w-5" />
-        <span>{languages.find(lang => lang.code === i18n.language)?.flag}</span>
+        <span>{languages.find((lang) => lang.code === i18n.language)?.flag || '🌐'}</span>
       </button>
 
       {isOpen && (

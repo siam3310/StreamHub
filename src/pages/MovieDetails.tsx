@@ -4,13 +4,25 @@ import { Clock, Star } from 'lucide-react';
 import { fetchMovieDetails } from '../services/api';
 import { MovieDetails as MovieDetailsType } from '../types/movie';
 
+interface Link {
+  quality: string;
+  link: string;
+}
+
+interface MovieData {
+  id: string;
+  file_name: string;
+  download_links: Link[];
+  watch_links: Link[];
+}
+
 export default function MovieDetails() {
   const { id } = useParams();
-  
   const navigate = useNavigate();
   const [movie, setMovie] = useState<MovieDetailsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [movieLinks, setMovieLinks] = useState<MovieData | null>(null);
 
   useEffect(() => {
     const loadMovie = async () => {
@@ -20,6 +32,12 @@ export default function MovieDetails() {
         setError(null);
         const data = await fetchMovieDetails(id);
         setMovie(data);
+
+        // Fetch the movie links from JSON
+        const response = await fetch('https://siamstv.vercel.app/tv/movies.json');
+        const linksData: MovieData[] = await response.json();
+        const selectedMovie = linksData.find((movieData) => movieData.id === id);
+        setMovieLinks(selectedMovie || null);
       } catch (error) {
         setError('Failed to load movie details. Please try again later.');
         console.error('Error fetching movie details:', error);
@@ -95,6 +113,51 @@ export default function MovieDetails() {
       </div>
       <div className="mx-auto max-w-7xl px-4 py-8">
         <p className="text-lg leading-relaxed text-gray-300">{movie.overview}</p>
+      </div>
+
+      {/* Download Section */}
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <h2 className="text-2xl font-bold text-white mb-4">Watch & Download</h2>
+
+        {movieLinks ? (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-2">Watch Links:</h3>
+              <div className="space-y-2">
+                {movieLinks.watch_links.map((link) => (
+                  <a
+                    key={link.quality}
+                    href={link.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
+                  >
+                    Watch in {link.quality}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-2">Download Links:</h3>
+              <div className="space-y-2">
+                {movieLinks.download_links.map((link) => (
+                  <a
+                    key={link.quality}
+                    href={link.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
+                  >
+                    Download in {link.quality}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-lg text-gray-400">No watch or download links available.</p>
+        )}
       </div>
     </div>
   );

@@ -2,42 +2,81 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ServerSelectorProps {
-  mediaType: 'movie' | 'tv'|"anime";
+  mediaType: 'movie' | 'tv' | 'anime';
   mediaId: string;
   selectedSeason?: number;
   selectedEpisode?: number;
 }
 
 const servers = [
-  { id: 'vidsrcme', name: 'server 1', url: 'https://vidsrc.icu/embed' },
-  { id: 'superembed', name: 'server 2', url: 'https://multiembed.mov/directstream.php' },
-  //{ id: 'vidsrc', name: 'server 3', url: 'www.vidbinge.com' },
-
+  {
+    id: 'movieapi',
+    name: 'MovieAPI (Ads)',
+    url: 'https://moviesapi.club/',
+    generateUrl: (mediaType: string, mediaId: string, season?: number, episode?: number) => {
+      return mediaType === 'movie'
+        ? `https://moviesapi.club/movie/${mediaId}`
+        : `https://moviesapi.club/tv/${mediaId}-${season}-${episode}`;
+    },
+  },
+  {
+    id: 'embed.su',
+    name: 'Embed.su',
+    url: 'https://embed.su/embed/',
+    generateUrl: (mediaType: string, mediaId: string, season?: number, episode?: number) => {
+      return mediaType === 'movie'
+        ? `https://embed.su/embed/movie/${mediaId}`
+        : `https://embed.su/embed/tv/${mediaId}/${season}/${episode}`;
+    },
+  },
+  {
+    id: 'smashy',
+    name: 'Smashy Stream',
+    url: 'https://player.smashy.stream/',
+    generateUrl: (mediaType: string, mediaId: string, season?: number, episode?: number) => {
+      return mediaType === 'movie'
+        ? `https://player.smashy.stream/movie/${mediaId}?playerList=D|SM`
+        : `https://player.smashy.stream/tv/${mediaId}?s=${season}&e=${episode}`;
+    },
+  },
+  {
+    id: 'vidsrc.pro',
+    name: 'VidSrc Pro',
+    url: 'https://vidsrc.pro/embed/',
+    generateUrl: (mediaType: string, mediaId: string, season?: number, episode?: number) => {
+      return mediaType === 'movie'
+        ? `https://vidsrc.pro/embed/movie/${mediaId}`
+        : `https://vidsrc.pro/embed/tv/${mediaId}/${season}/${episode}`;
+    },
+  },
+  {
+    id: 'vidsrc.cc',
+    name: 'VidSrc CC',
+    url: 'https://vidsrc.cc/v2/embed/',
+    generateUrl: (mediaType: string, mediaId: string, season?: number, episode?: number) => {
+      return mediaType === 'movie'
+        ? `https://vidsrc.cc/v2/embed/movie/${mediaId}`
+        : `https://vidsrc.cc/v2/embed/tv/${mediaId}/${season}/${episode}`;
+    },
+  },
+  {
+    id: 'autoembed',
+    name: 'AutoEmbed',
+    url: 'https://player.autoembed.cc/embed/',
+    generateUrl: (mediaType: string, mediaId: string, season?: number, episode?: number) => {
+      return mediaType === 'movie'
+        ? `https://player.autoembed.cc/embed/movie/${mediaId}`
+        : `https://player.autoembed.cc/embed/tv/${mediaId}/${season}/${episode}`;
+    },
+  },
 ];
 
 export default function ServerSelector({ mediaType, mediaId, selectedSeason, selectedEpisode }: ServerSelectorProps) {
   const [selectedServer, setSelectedServer] = useState(servers[0]);
   const { t } = useTranslation();
 
-
   const generateWatchLink = () => {
-    switch (selectedServer.id) {
-      case 'vidsrcme':
-        return mediaType === 'movie'
-          ? `${selectedServer.url}/movie/${mediaId}`
-          : `${selectedServer.url}/tv/${mediaId}/${selectedSeason}/${selectedEpisode}`;
-      case 'vidsrc':
-        return mediaType === 'movie'
-          ? `${selectedServer.url}/movie/${mediaId}`
-          : `${selectedServer.url}/tv/${mediaId}/${selectedSeason}/${selectedEpisode}`;
-     
-      case 'superembed':
-        return mediaType === 'movie'
-          ? `${selectedServer.url}?video_id=${mediaId}&tmdb=1`
-          : `${selectedServer.url}?video_id=${mediaId}&tmdb=1&season=${selectedSeason}&episode=${selectedEpisode}`;
-      default:
-        return '';
-    }
+    return selectedServer.generateUrl(mediaType, mediaId, selectedSeason, selectedEpisode);
   };
 
   return (
@@ -57,10 +96,11 @@ export default function ServerSelector({ mediaType, mediaId, selectedSeason, sel
           </button>
         ))}
       </div>
-      <p className='text-sm text-center py-4 px-2 font-medium text-red-500 text-wrap'>{t("Content.serverInfo")}</p>
-      
-      <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
+      <p className="text-sm text-center py-4 px-2 font-medium text-red-500 text-wrap">
+        {t('Content.serverInfo')}
+      </p>
 
+      <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
         <iframe
           src={generateWatchLink()}
           frameBorder="0"
